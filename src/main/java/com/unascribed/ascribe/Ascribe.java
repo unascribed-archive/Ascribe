@@ -4,26 +4,27 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.mutable.MutableFloat;
+
 import com.github.gfx.util.WeakIdentityHashMap;
 import com.google.common.collect.Lists;
 
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.Mod;
-import cpw.mods.fml.common.Mod.EventHandler;
-import cpw.mods.fml.common.Mod.Instance;
-import cpw.mods.fml.common.event.FMLPreInitializationEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.Phase;
-import cpw.mods.fml.common.gameevent.TickEvent.PlayerTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.ServerTickEvent;
-import cpw.mods.fml.common.gameevent.TickEvent.WorldTickEvent;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.PlayerTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ServerTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.WorldTickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.world.GameRules.ValueType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.world.WorldEvent;
@@ -54,7 +55,6 @@ public class Ascribe {
 		network = NetworkRegistry.INSTANCE.newSimpleChannel("Ascribe");
 		registerMessage(AttackedAtYawMessage.class, 0, Side.CLIENT);
 		
-		FMLCommonHandler.instance().bus().register(this);
 		MinecraftForge.EVENT_BUS.register(this);
 	}
 	
@@ -77,6 +77,7 @@ public class Ascribe {
 					AttackedAtYawMessage aaym = new AttackedAtYawMessage();
 					aaym.yaw = e.player.attackedAtYaw;
 					network.sendTo(aaym, (EntityPlayerMP)e.player);
+					lastAttackedAtYaw.get(e.player).setValue(e.player.attackedAtYaw);
 				}
 			}
 		}
@@ -85,7 +86,7 @@ public class Ascribe {
 	@SubscribeEvent
 	public void onWorldLoad(WorldEvent.Load e) {
 		if (getOption(AscribeOption.GAMERULE_DO_DOWNFALL)) {
-			e.world.getGameRules().addGameRule("doDownfall", "true");
+			e.world.getGameRules().addGameRule("doDownfall", "true", ValueType.BOOLEAN_VALUE);
 		}
 	}
 	
@@ -103,7 +104,7 @@ public class Ascribe {
 	public void onWorldTick(WorldTickEvent e) {
 		if (e.phase == Phase.START) {
 			if (getOption(AscribeOption.GAMERULE_DO_DOWNFALL)) {
-				if (!e.world.getGameRules().getGameRuleBooleanValue("doDownfall")) {
+				if (!e.world.getGameRules().getBoolean("doDownfall")) {
 					e.world.getWorldInfo().setRainTime(0);
 					e.world.getWorldInfo().setThunderTime(0);
 					e.world.getWorldInfo().setRaining(false);

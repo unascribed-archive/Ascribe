@@ -6,3 +6,4 @@ minecraft
 .classpath
 .project
 eclipse
+*.launch

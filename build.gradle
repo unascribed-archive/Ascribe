@@ -12,28 +12,28 @@ buildscript {
 		}
 	}
 	dependencies {
-		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+		classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
 		classpath 'me.tatarka:gradle-retrolambda:3.2.0'
 	}
 }
 
-apply plugin: 'forge'
+plugins {
+	id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
 apply plugin: 'me.tatarka.retrolambda'
 
 group = "com.unascribed"
 archivesBaseName = "Ascribe"
-version = "1.7.10-0.1"
+version = "1.8.9-0.1"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
-configurations {
-	shade
-	compile.extendsFrom shade
-}
-
 dependencies {
-	shade 'com.github.gfx.util:weak-identity-hash-map:2.0.1'
+	compile 'com.github.gfx.util:weak-identity-hash-map:2.0.1'
+	shadow 'com.github.gfx.util:weak-identity-hash-map:2.0.1'
 }
 
 retrolambda {
@@ -50,22 +50,34 @@ jar {
 			'FMLAT': 'ascribe_at.cfg'
 		)
 	}
-	configurations.shade.each { dep ->
-		from(project.zipTree(dep)){
-			exclude 'META-INF', 'META-INF/**'
-		}
-	}
+	classifier = 'slim'
+}
+
+
+shadowJar {
+	classifier = ''
+	relocate 'com.github.gfx.util', "com.unascribed.ascribe.repackage.com.github.gfx.util"
+}
+
+reobf {
+	shadowJar { mappingType = 'SEARGE' }
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+	archives shadowJar
 }
 
 minecraft {
-	version = "1.7.10-10.13.4.1614-1.7.10"
+	version = "1.8.9-11.15.1.1761"
+	mappings = "snapshot_20160224"
+	
 	runDir = "eclipse"
 	
 	replaceIn "src/main/java/com/unascribed/ascribe/Ascribe.java"
 	replace "@VERSION@", project.version
 	replace "@MCVERSION@", project.minecraft.version
-	
-	srgExtra 'PK:com/github/gfx/util com/unascribed/ascribe/repackage/com/github/gfx/util'
 }
 
 processResources {
