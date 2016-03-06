@@ -1,0 +1,17 @@
+[
+{
+  "modid": "ascribe",
+  "name": "Ascribe",
+  "description": "General fixes and tweaks for vanilla.",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "http://minecraft.curseforge.com/projects/ascribe",
+  "updateUrl": "",
+  "authorList": ["Aesen"],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": [
+  ]
+}
+]

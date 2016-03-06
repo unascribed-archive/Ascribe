@@ -1,0 +1,88 @@
+buildscript {
+	repositories {
+		mavenCentral()
+		jcenter()
+		maven {
+			name = "forge"
+			url = "http://files.minecraftforge.net/maven"
+		}
+		maven {
+			name = "sonatype"
+			url = "https://oss.sonatype.org/content/repositories/snapshots/"
+		}
+	}
+	dependencies {
+		classpath 'net.minecraftforge.gradle:ForgeGradle:1.2-SNAPSHOT'
+		classpath 'me.tatarka:gradle-retrolambda:3.2.0'
+	}
+}
+
+apply plugin: 'forge'
+apply plugin: 'me.tatarka.retrolambda'
+
+group = "com.unascribed"
+archivesBaseName = "Ascribe"
+version = "1.7.10-0.1"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+configurations {
+	shade
+	compile.extendsFrom shade
+}
+
+dependencies {
+	shade 'com.github.gfx.util:weak-identity-hash-map:2.0.1'
+}
+
+retrolambda {
+	jdk "/usr/lib/jvm/java-8-oracle"
+	oldJdk "/usr/lib/jvm/java-6-openjdk-amd64"
+	javaVersion JavaVersion.VERSION_1_6
+	defaultMethods true
+	
+}
+
+jar {
+	manifest {
+		attributes (
+			'FMLAT': 'ascribe_at.cfg'
+		)
+	}
+	configurations.shade.each { dep ->
+		from(project.zipTree(dep)){
+			exclude 'META-INF', 'META-INF/**'
+		}
+	}
+}
+
+minecraft {
+	version = "1.7.10-10.13.4.1614-1.7.10"
+	runDir = "eclipse"
+	
+	replaceIn "src/main/java/com/unascribed/ascribe/Ascribe.java"
+	replace "@VERSION@", project.version
+	replace "@MCVERSION@", project.minecraft.version
+	
+	srgExtra 'PK:com/github/gfx/util com/unascribed/ascribe/repackage/com/github/gfx/util'
+}
+
+processResources {
+	// this will ensure that this task is redone when the versions change.
+	inputs.property "version", project.version
+	inputs.property "mcversion", project.minecraft.version
+
+	// replace stuff in mcmod.info, nothing else
+	from(sourceSets.main.resources.srcDirs) {
+		include 'mcmod.info'
+				
+		// replace version and mcversion
+		expand 'version':project.version, 'mcversion':project.minecraft.version
+	}
+		
+	// copy everything else, thats not the mcmod.info
+	from(sourceSets.main.resources.srcDirs) {
+		exclude 'mcmod.info'
+	}
+}

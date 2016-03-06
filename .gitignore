@@ -1,0 +1,8 @@
+build
+bin
+minecraft
+.gradle
+.settings
+.classpath
+.project
+eclipse
