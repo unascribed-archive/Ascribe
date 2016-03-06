@@ -65,7 +65,7 @@ minecraft {
 	replace "@VERSION@", project.version
 	replace "@MCVERSION@", project.minecraft.version
 	
-	srgExtra 'PK:com/github/gfx/util com/unascribed/ascribe/repackage/com/github/gfx/util'
+	srgExtra "PK: com/github/gfx/util com/unascribed/ascribe/repackage/com/github/gfx/util"
 }
 
 processResources {
