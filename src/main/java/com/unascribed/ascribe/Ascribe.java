@@ -77,6 +77,7 @@ public class Ascribe {
 					AttackedAtYawMessage aaym = new AttackedAtYawMessage();
 					aaym.yaw = e.player.attackedAtYaw;
 					network.sendTo(aaym, (EntityPlayerMP)e.player);
+					lastAttackedAtYaw.get(e.player).setValue(e.player.attackedAtYaw);
 				}
 			}
 		}
