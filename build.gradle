@@ -26,7 +26,7 @@ apply plugin: 'me.tatarka.retrolambda'
 
 group = "com.unascribed"
 archivesBaseName = "Ascribe"
-version = "1.8.9-0.1"
+version = "1.8.9-0.1.1"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8

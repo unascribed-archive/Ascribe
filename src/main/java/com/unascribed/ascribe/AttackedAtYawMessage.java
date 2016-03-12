@@ -26,7 +26,9 @@ public class AttackedAtYawMessage implements IMessage, IMessageHandler<AttackedA
 	@SideOnly(Side.CLIENT)
 	public IMessage onMessage(AttackedAtYawMessage message, MessageContext ctx) {
 		if (Ascribe.getOption(AscribeOption.SYNC_ATTACKED_AT_YAW)) {
-			Minecraft.getMinecraft().thePlayer.attackedAtYaw = message.yaw;
+			Minecraft.getMinecraft().addScheduledTask(() -> {
+				Minecraft.getMinecraft().thePlayer.attackedAtYaw = message.yaw;
+			});
 		}
 		return null;
 	}
